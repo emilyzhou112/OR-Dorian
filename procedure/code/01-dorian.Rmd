@@ -55,6 +55,7 @@ writeLines(
 )
 ```
 
+
 ## Set up Twitter Application
 
 You will need Twitter Developer API access to run this analysis:
@@ -104,8 +105,10 @@ twitter_token <- create_token(
   consumer_secret = dlgInput("Consumer Secret:", twitter_vars$secret)$res,
   access_token = NULL,
   access_secret = NULL
+
 )
 ```
+
 
 # Pre-processing
 
@@ -325,6 +328,7 @@ Create a temporal data frame and graph it
 dorian_tweets_by_hour <- ts_data(dorian, by = "hours")
 ts_plot(dorian, by = "hours")
 ```
+happend on Sep 5th
 
 # Network Analysis
 
@@ -656,3 +660,49 @@ ggplot() +
     axis.title.y = element_blank()
   )
 ```
+
+```{r tweet density map}
+
+ggplot() +
+  geom_sf(data = counties, 
+    aes(fill = cut_interval(ntdi, 5)), color = "grey", lwd = 0.1, alpha = 0.8) +
+  scale_fill_brewer(palette = "PuRd") +
+  guides(fill = guide_legend(title = "Normalized Differences")) +
+  labs(title = "Tweet Location During Hurricane Dorian") +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank()
+  ) +
+  xlim(-96, -67) +
+  ylim(24, 47)
+
+
+```
+
+```{r tweet density}
+
+counties <- counties %>% 
+  mutate(dorrate_fake = if_else(dorrate == 0, 0.1, dorrate)) %>% 
+  mutate(dorrate_log = log(dorrate_fake))
+    
+  
+ggplot() +
+  geom_sf(data = counties, 
+    aes(fill = cut_interval(dorrate_log, 5)), color = "grey", lwd = 0.1, alpha = 0.8) +
+  scale_fill_brewer(palette = "YlGnBu") +
+  guides(fill = guide_legend(title = "Density")) +
+  labs(title = "Tweet Density") +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank()
+  ) +
+  xlim(-96, -67) +
+  ylim(24, 47)
+
+
+```
+
+
+
